@@ -34,40 +34,42 @@ public class Parser implements IParser {
 	private void build(StringBuilder builder, int tabs) {
 		builder.append(tabs(tabs) + token.current().token() + " " + token.current().value() + "\n");
 	}
-	
+
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
 
 	class AssignmentNode implements INode {
-		String id;
-		char assign;
-		char semCol;
+		
+		Lexeme assign, semiCol, id;
 		INode exp;
 
 		@Override
-		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
+		public Lexeme evaluate() throws Exception {
+			return exp.evaluate();
 		}
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
 				throws IOException, TokenizerException, ParserException {
 			builder.append("AssignmentNode\n");
-			
+
 			token.moveNext();
 			if (token.current().token() == Token.IDENT) {
+				id = token.current();
 				build(builder, tabs);
 				token.moveNext();
 				if (token.current().token() == Token.ASSIGN_OP) {
+					assign = token.current(); //UNNESSESARY ATM
 					build(builder, tabs);
 					token.moveNext();
 					exp = new ExpressionNode();
 					exp.buildString(builder, tabs + 1);
-					
-					if (token.current().token() == Token.SEMICOLON)
+
+					if (token.current().token() == Token.SEMICOLON) {
+						semiCol = token.current(); //UNNESSESARY ATM
 						build(builder, tabs);
+					}
 					else
 						throw new ParserException("Semicolon missing from assignment: " + token.current().value());
 
@@ -82,11 +84,26 @@ public class Parser implements IParser {
 
 	class ExpressionNode implements INode {
 		INode term, exp;
-		char arOp;
+		Lexeme arOp;
 
 		@Override
-		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+		public Lexeme evaluate() throws Exception {
+			
+			
+			
+			if (term != null && exp == null && arOp == null)
+				return term.evaluate();
+			else if (term != null && exp != null && arOp != null) {
+				if (arOp.token() == Token.DIV_OP) {
+					return new Lexeme(
+							(double)term.evaluate().value() + (double)exp.evaluate().value(),
+							Token.INT_LIT);
+				} else if (arOp.token() == Token.SUB_OP) {
+					return new Lexeme(
+							(double) term.evaluate().value() - (double)exp.evaluate().value(),
+							Token.INT_LIT);
+				}
+			}
 			return null;
 		}
 
@@ -98,11 +115,11 @@ public class Parser implements IParser {
 			term = new TermNode();
 			term.buildString(builder, tabs + 1);
 
-			
 			if (token.current().token() == Token.ADD_OP || token.current().token() == Token.SUB_OP) {
+				arOp = token.current();
 				build(builder, tabs);
 				token.moveNext();
-				
+
 				exp = new ExpressionNode();
 				exp.buildString(builder, tabs + 1);
 			}
@@ -112,11 +129,23 @@ public class Parser implements IParser {
 
 	class TermNode implements INode {
 		INode fact, term;
-		char arOp;
+		Lexeme arOp;
 
 		@Override
-		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+		public Lexeme evaluate() throws Exception {			
+			if (fact != null && term == null && arOp == null)
+				return fact.evaluate();
+			else if (fact != null && term != null && arOp != null) {
+				if (arOp.token() == Token.MULT_OP) {
+					return new Lexeme(
+							(double)fact.evaluate().value() * (double)term.evaluate().value(),
+							Token.INT_LIT);
+				} else if (arOp.token() == Token.DIV_OP) {
+					return new Lexeme(
+							(double) fact.evaluate().value() / (double)term.evaluate().value(),
+							Token.INT_LIT);
+				}
+			}
 			return null;
 		}
 
@@ -128,11 +157,11 @@ public class Parser implements IParser {
 			fact = new FactorNode();
 			fact.buildString(builder, tabs + 1);
 
-		
 			if (token.current().token() == Token.MULT_OP || token.current().token() == Token.DIV_OP) {
+				arOp = token.current();
 				build(builder, tabs);
 				token.moveNext();
-				
+
 				term = new TermNode();
 				term.buildString(builder, tabs + 1);
 			}
@@ -142,13 +171,16 @@ public class Parser implements IParser {
 	// ______________________________________________________________________________________________
 
 	class FactorNode implements INode {
-		int num;
-		char lP, rP;
+		Lexeme lex;
 		INode exp;
 
 		@Override
-		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+		public Lexeme evaluate() throws Exception {
+			if (lex != null)
+				return lex;
+			else if (exp != null) {
+				return exp.evaluate();
+			}
 			return null;
 		}
 
@@ -157,8 +189,8 @@ public class Parser implements IParser {
 				throws IOException, TokenizerException, ParserException {
 			builder.append(tabs(tabs - 1) + "FactorNode\n");
 
-			
 			if (token.current().token() == Token.INT_LIT) {
+				lex = token.current();
 				build(builder, tabs);
 				token.moveNext();
 			} else if (token.current().token() == Token.LEFT_PAREN) {
@@ -168,7 +200,6 @@ public class Parser implements IParser {
 				exp = new ExpressionNode();
 				exp.buildString(builder, tabs + 1);
 
-			
 				if (token.current().token() == Token.RIGHT_PAREN) {
 					build(builder, tabs);
 					token.moveNext();

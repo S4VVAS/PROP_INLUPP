@@ -32,4 +32,4 @@ AssignmentNode
 	SEMICOLON ;
 
 EVALUATION:
-a = 1.8
+null

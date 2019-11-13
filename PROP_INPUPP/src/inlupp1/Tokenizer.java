@@ -83,7 +83,7 @@ public class Tokenizer implements ITokenizer {
 				s = s + scanner.current();
 				scanner.moveNext();
 			}while(Character.isDigit(scanner.current()));
-			return new Lexeme(Integer.parseInt(s), Token.INT_LIT);
+			return new Lexeme(Double.parseDouble(s), Token.INT_LIT);
 		}
 		
 		else if(symbols.containsKey(ch)) {

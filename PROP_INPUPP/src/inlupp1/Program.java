@@ -28,7 +28,7 @@ public class Program {
 				builder.append("PARSE TREE:\n");
 				root.buildString(builder, 1);
 				//builder.append("\nEVALUATION:\n");
-				//builder.append(root.evaluate(null));
+				//builder.append(root.evaluate());
 				
 				//stream = new FileOutputStream(outputFileName);
 				//writer = new OutputStreamWriter(stream);
