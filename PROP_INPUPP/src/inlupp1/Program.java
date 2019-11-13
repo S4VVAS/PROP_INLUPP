@@ -27,12 +27,12 @@ public class Program {
 				builder = new StringBuilder();
 				builder.append("PARSE TREE:\n");
 				root.buildString(builder, 1);
-				//builder.append("\nEVALUATION:\n");
-				//builder.append(root.evaluate());
+				builder.append("\nEVALUATION:\n");
+				builder.append(root.evaluate());
 				
-				//stream = new FileOutputStream(outputFileName);
-				//writer = new OutputStreamWriter(stream);
-				//writer.write(builder.toString());
+				stream = new FileOutputStream(outputFileName);
+				writer = new OutputStreamWriter(stream);
+				writer.write(builder.toString());
 				
 				System.out.println(builder.toString());
 			}

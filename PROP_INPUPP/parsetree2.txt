@@ -1,7 +1,6 @@
 PARSE TREE:
 BlockNode
-LEFT_CURLY {
-	StatementsNode
+	StatementNode
 		AssignmentNode
 			IDENT a
 			ASSIGN_OP =
@@ -33,7 +32,7 @@ LEFT_CURLY {
 							FactorNode
 								INT_LIT 5.0
 			SEMICOLON ;
-		StatementsNode
+		StatementNode
 			AssignmentNode
 				IDENT b
 				ASSIGN_OP =
@@ -65,7 +64,7 @@ LEFT_CURLY {
 											FactorNode
 												INT_LIT 2.0
 				SEMICOLON ;
-			StatementsNode
+			StatementNode
 				AssignmentNode
 					IDENT c
 					ASSIGN_OP =
@@ -79,10 +78,9 @@ LEFT_CURLY {
 								FactorNode
 									IDENT a
 					SEMICOLON ;
-				StatementsNode
-RIGHT_CURLY }
+				StatementNode
+					AssignmentNode
+	RIGHT_CURLY }
 
 EVALUATION:
-a = 1.8
-b = -0.2
-c = 1.6
+null
