@@ -11,7 +11,6 @@ public class Parser implements IParser {
 	public void open(String fileName) throws IOException, TokenizerException {
 		token = new Tokenizer();
 		token.open(fileName);
-
 	}
 
 	@Override
@@ -36,18 +35,13 @@ public class Parser implements IParser {
 	private void build(StringBuilder builder, int tabs) {
 		builder.append(tabs(tabs) + token.current().token() + " " + token.current().value() + "\n");
 	}
-
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
-
 	class BlockNode implements INode {
-
 		INode stm;
-		Lexeme rB, lB;
 		Object[] variables;
 		
-
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
 				throws IOException, TokenizerException, ParserException {
@@ -81,15 +75,12 @@ public class Parser implements IParser {
 				System.out.println(((AssignedValue) variables[i]).getValue());
 				evaluation = evaluation + ((AssignedValue) variables[i]).getId() + " = " +((AssignedValue) variables[i]).getValue() + "\n";
 			}
-			
 			return evaluation;
 		}
 	}
-
 	// ______________________________________________________________________________________________
 	class StatementNode implements INode {
 		INode assign, stm;
-		
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -97,18 +88,15 @@ public class Parser implements IParser {
 			builder.append(tabs(tabs - 1) + "StatementNode\n");
 
 			try {
-
 				assign = new AssignmentNode();
 				assign.buildString(builder, tabs + 1);
 
 				stm = new StatementNode();
 				stm.buildString(builder, tabs + 1);
-
-			} catch (Exception e) {
-			}
-
+				
+			} catch (Exception e) {}
 		}
-		
+
 		public int getInstances() {
 			if(stm != null)
 				return ((StatementNode) stm).getInstances() + 1;
@@ -125,11 +113,9 @@ public class Parser implements IParser {
 			return assign.evaluate(args);
 		}
 	}
-
 	// ______________________________________________________________________________________________
 	class AssignmentNode implements INode {
-
-		Lexeme assign, semiCol, id;
+		Lexeme id;
 		INode exp;
 
 		@Override
@@ -137,14 +123,12 @@ public class Parser implements IParser {
 				throws IOException, TokenizerException, ParserException {
 			builder.append(tabs(tabs - 1) + "AssignmentNode\n");
 
-			// token.moveNext();
-			// //----------------------------------------------------------------------------------------------------------------------------------------------
 			if (token.current().token() == Token.IDENT) {
 				id = token.current();
 				build(builder, tabs);
 				token.moveNext();
+				
 				if (token.current().token() == Token.ASSIGN_OP) {
-					assign = token.current(); // UNNESSESARY ATM
 					build(builder, tabs);
 					token.moveNext();
 
@@ -152,12 +136,10 @@ public class Parser implements IParser {
 					exp.buildString(builder, tabs + 1);
 
 					if (token.current().token() == Token.SEMICOLON) {
-						semiCol = token.current(); // UNNESSESARY ATM
 						build(builder, tabs);
 						token.moveNext();
 					} else
 						throw new ParserException("Semicolon missing from assignment: " + token.current().value());
-
 				} else
 					throw new ParserException("Assignment of id missing: " + token.current().value());
 			} else
@@ -174,10 +156,8 @@ public class Parser implements IParser {
 			}
 			return args;
 		}
-
 	}
 	// ______________________________________________________________________________________________
-
 	class ExpressionNode implements INode {
 		INode term, exp;
 		Lexeme arOp;
@@ -215,11 +195,9 @@ public class Parser implements IParser {
 				}
 			}
 			return null;
-
 		}
 	}
 	// ______________________________________________________________________________________________
-
 	class TermNode implements INode {
 		INode fact, term;
 		Lexeme arOp;
@@ -244,7 +222,6 @@ public class Parser implements IParser {
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-
 			if (fact != null && term == null && arOp == null)
 				return fact.evaluate(args);
 			else if (fact != null && term != null && arOp != null) {
@@ -258,10 +235,8 @@ public class Parser implements IParser {
 			}
 			return null;
 		}
-
 	}
 	// ______________________________________________________________________________________________
-
 	class FactorNode implements INode {
 		Lexeme lex;
 		INode exp;
@@ -287,10 +262,8 @@ public class Parser implements IParser {
 					token.moveNext();
 				} else
 					throw new ParserException("Closing parentheses missing: " + token.current().value());
-
 			} else
 				throw new ParserException("False factor: " + token.current().value());
-
 		}
 
 		@Override
@@ -309,7 +282,6 @@ public class Parser implements IParser {
 			}
 			return null;
 		}
-
 	}
-
+	
 }
