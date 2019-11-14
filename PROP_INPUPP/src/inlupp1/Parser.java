@@ -35,35 +35,15 @@ public class Parser implements IParser {
 	private void build(StringBuilder builder, int tabs) {
 		builder.append(tabs(tabs) + token.current().token() + " " + token.current().value() + "\n");
 	}
-	
-	class AssignedValue{
-		private String id;
-		private Double value;
-		
-		public AssignedValue(Lexeme id, Lexeme value) {
-			if(id.value() instanceof String && value.value() instanceof Double)
-			this.id = (String) id.value();
-			this.value = (Double) value.value();
-		}
-		
-		public String getId() {
-			return id;
-		}
-		
-		public double getValue() {
-			return value;
-		}
-	}
 
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
-	
+
 	class BlockNode implements INode {
 
 		INode stm;
 		Lexeme rB, lB;
-
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -100,8 +80,6 @@ public class Parser implements IParser {
 		INode assign, stm;
 		ArrayList<AssignedValue> ass = new ArrayList<AssignedValue>();
 
-	
-
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
 				throws IOException, TokenizerException, ParserException {
@@ -111,7 +89,6 @@ public class Parser implements IParser {
 
 				assign = new AssignmentNode();
 				assign.buildString(builder, tabs + 1);
-				
 
 				stm = new StatementNode();
 				stm.buildString(builder, tabs + 1);
@@ -120,8 +97,6 @@ public class Parser implements IParser {
 			}
 
 		}
-
-
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
@@ -135,7 +110,6 @@ public class Parser implements IParser {
 
 		Lexeme assign, semiCol, id;
 		INode exp;
-
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -169,7 +143,6 @@ public class Parser implements IParser {
 				throw new ParserException("Wrong id: " + token.current().value());
 		}
 
-
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
 			// TODO Auto-generated method stub
@@ -182,8 +155,6 @@ public class Parser implements IParser {
 	class ExpressionNode implements INode {
 		INode term, exp;
 		Lexeme arOp;
-
-		
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -203,8 +174,6 @@ public class Parser implements IParser {
 			}
 		}
 
-
-
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
 			// TODO Auto-generated method stub
@@ -216,8 +185,6 @@ public class Parser implements IParser {
 	class TermNode implements INode {
 		INode fact, term;
 		Lexeme arOp;
-
-
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -237,8 +204,6 @@ public class Parser implements IParser {
 			}
 		}
 
-
-
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
 			// TODO Auto-generated method stub
@@ -251,8 +216,6 @@ public class Parser implements IParser {
 	class FactorNode implements INode {
 		Lexeme lex;
 		INode exp;
-
-
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -280,8 +243,6 @@ public class Parser implements IParser {
 				throw new ParserException("False factor: " + token.current().value());
 
 		}
-
-
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {

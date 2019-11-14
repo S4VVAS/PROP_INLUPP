@@ -1,4 +1,5 @@
 package inlupp1;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -6,13 +7,13 @@ import java.util.Map;
 public class Tokenizer implements ITokenizer {
 
 	private static Map<Character, Token> symbols = new HashMap<Character, Token>();
-	
+
 	private Scanner scanner = null;
 	private Lexeme current = null;
 	private Lexeme next = null;
-	
+
 	public Tokenizer() {
-	
+
 		symbols.put(new Character('+'), Token.ADD_OP);
 		symbols.put(new Character('-'), Token.SUB_OP);
 		symbols.put(new Character('*'), Token.MULT_OP);
@@ -24,14 +25,14 @@ public class Tokenizer implements ITokenizer {
 		symbols.put(new Character('{'), Token.LEFT_CURLY);
 		symbols.put(new Character('}'), Token.RIGHT_CURLY);
 	}
-	
+
 	@Override
 	public void open(String fileName) throws IOException, TokenizerException {
 		scanner = new Scanner();
 		scanner.open(fileName);
 		scanner.moveNext();
 		next = extractLexeme();
-		
+
 	}
 
 	@Override
@@ -47,10 +48,10 @@ public class Tokenizer implements ITokenizer {
 		if (next.token() != Token.EOF)
 			next = extractLexeme();
 	}
-	
+
 	private void consumeWhiteSpaces() {
-		while (Character.isWhitespace(scanner.current())){
-		    try {
+		while (Character.isWhitespace(scanner.current())) {
+			try {
 				scanner.moveNext();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -61,38 +62,37 @@ public class Tokenizer implements ITokenizer {
 	private Lexeme extractLexeme() throws TokenizerException, IOException {
 		consumeWhiteSpaces();
 		Character ch = scanner.current();
-		
-		
-		if(ch == Scanner.EOF || ch == null) {
+
+		if (ch == Scanner.EOF || ch == null) {
 			scanner.moveNext();
 			return new Lexeme(ch, Token.EOF);
 		}
-		
-		else if(Character.isAlphabetic(ch)) {
+
+		else if (Character.isAlphabetic(ch)) {
 			String s = "";
 			do {
 				s = s + scanner.current();
 				scanner.moveNext();
-			}while(Character.isAlphabetic(scanner.current()));
+			} while (Character.isAlphabetic(scanner.current()));
 			return new Lexeme(s, Token.IDENT);
 		}
-		
-		else if(Character.isDigit(ch)) {
+
+		else if (Character.isDigit(ch)) {
 			String s = "";
 			do {
 				s = s + scanner.current();
 				scanner.moveNext();
-			}while(Character.isDigit(scanner.current()));
+			} while (Character.isDigit(scanner.current()));
 			return new Lexeme(Double.parseDouble(s), Token.INT_LIT);
 		}
-		
-		else if(symbols.containsKey(ch)) {
+
+		else if (symbols.containsKey(ch)) {
 			scanner.moveNext();
 			return new Lexeme(ch, symbols.get(ch));
 		}
-		
+
 		throw new TokenizerException("Unknown character: " + String.valueOf(ch));
-		
+
 	}
 
 	@Override
