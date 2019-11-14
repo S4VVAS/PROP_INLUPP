@@ -2,6 +2,7 @@ package inlupp1;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser implements IParser {
 	Tokenizer token;
@@ -44,6 +45,8 @@ public class Parser implements IParser {
 
 		INode stm;
 		Lexeme rB, lB;
+		Object[] variables;
+		
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -65,20 +68,28 @@ public class Parser implements IParser {
 							"Block must be contained within brackets {-BLOCK-}. Closing bracket missing");
 			} else
 				throw new ParserException("Block must be contained within brackets {-BLOCK-}. Opening bracket missing");
-
 		}
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
+			variables = new Object[((StatementNode) stm).getInstances()];
+			variables = (Object[]) stm.evaluate(variables);
+			
+			String evaluation = "";
+			
+			for(int i = 0; i < variables.length; i++) {
+				System.out.println(((AssignedValue) variables[i]).getValue());
+				evaluation = evaluation + ((AssignedValue) variables[i]).getId() + " = " +((AssignedValue) variables[i]).getValue() + "\n";
+			}
+			
+			return evaluation;
 		}
 	}
 
 	// ______________________________________________________________________________________________
 	class StatementNode implements INode {
 		INode assign, stm;
-		ArrayList<AssignedValue> ass = new ArrayList<AssignedValue>();
+		
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -97,11 +108,21 @@ public class Parser implements IParser {
 			}
 
 		}
+		
+		public int getInstances() {
+			if(stm != null)
+				return ((StatementNode) stm).getInstances() + 1;
+			return 0;
+		}
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
+			try {
+				return stm.evaluate((Object[]) assign.evaluate(args));
+			}catch(Exception e) {
+				
+			}
+			return assign.evaluate(args);
 		}
 	}
 
@@ -145,8 +166,13 @@ public class Parser implements IParser {
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
+			for(int i = 0; i < args.length; i++) {
+				if(args[i] == null) {
+					args[i] = new AssignedValue(id, (Lexeme) exp.evaluate(args));
+					return args;
+				}
+			}
+			return args;
 		}
 
 	}
@@ -176,8 +202,20 @@ public class Parser implements IParser {
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+			
+			if (term != null && exp == null && arOp == null)
+				return term.evaluate(args);
+			else if (term != null && exp != null && arOp != null) {
+				if (arOp.token() == Token.ADD_OP) {
+					return new Lexeme((double) ((Lexeme) term.evaluate(args)).value() + (double) ((Lexeme) exp.evaluate(args)).value(),
+							Token.INT_LIT);
+				} else if (arOp.token() == Token.SUB_OP) {
+					return new Lexeme((double) ((Lexeme) term.evaluate(args)).value() - (double) ((Lexeme) exp.evaluate(args)).value(),
+							Token.INT_LIT);
+				}
+			}
 			return null;
+
 		}
 	}
 	// ______________________________________________________________________________________________
@@ -206,7 +244,18 @@ public class Parser implements IParser {
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+
+			if (fact != null && term == null && arOp == null)
+				return fact.evaluate(args);
+			else if (fact != null && term != null && arOp != null) {
+				if (arOp != null && arOp.token() == Token.MULT_OP) {
+					return new Lexeme((double) ((Lexeme) fact.evaluate(args)).value() * (double) ((Lexeme) term.evaluate(args)).value(),
+							Token.INT_LIT);
+				} else if (arOp.token() == Token.DIV_OP) {
+					return new Lexeme((double) ((Lexeme) fact.evaluate(args)).value() / (double) ((Lexeme) term.evaluate(args)).value(),
+							Token.INT_LIT);
+				}
+			}
 			return null;
 		}
 
@@ -246,7 +295,18 @@ public class Parser implements IParser {
 
 		@Override
 		public Object evaluate(Object[] args) throws Exception {
-			// TODO Auto-generated method stub
+			if (lex != null && lex.token() == Token.INT_LIT)
+				return lex;
+			else if(lex != null && lex.token() == Token.IDENT) {
+				for(Object o: args) {
+					if(((AssignedValue) o).getId().equals(lex.value())) {
+						return new Lexeme(((AssignedValue) o).getValue(), Token.INT_LIT);
+					}
+				}
+			}
+			else if (exp != null) {
+				return exp.evaluate(args);
+			}
 			return null;
 		}
 
