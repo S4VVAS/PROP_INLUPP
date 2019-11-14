@@ -37,28 +37,33 @@ public class Parser implements IParser {
 	}
 	
 	class AssignedValue{
-		Lexeme id;
-		Lexeme value;
+		private String id;
+		private Double value;
 		
 		public AssignedValue(Lexeme id, Lexeme value) {
-			this.id = id;
-			this.value = value;
+			if(id.value() instanceof String && value.value() instanceof Double)
+			this.id = (String) id.value();
+			this.value = (Double) value.value();
+		}
+		
+		public String getId() {
+			return id;
+		}
+		
+		public double getValue() {
+			return value;
 		}
 	}
 
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
 	// ______________________________________________________________________________________________
+	
 	class BlockNode implements INode {
 
 		INode stm;
 		Lexeme rB, lB;
 
-		@Override
-		public Lexeme evaluate() throws Exception {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -82,6 +87,12 @@ public class Parser implements IParser {
 				throw new ParserException("Block must be contained within brackets {-BLOCK-}. Opening bracket missing");
 
 		}
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	// ______________________________________________________________________________________________
@@ -89,14 +100,7 @@ public class Parser implements IParser {
 		INode assign, stm;
 		ArrayList<AssignedValue> ass = new ArrayList<AssignedValue>();
 
-		@Override
-		public Lexeme evaluate() throws Exception {
-			return null;
-		}
-		
-		public ArrayList<AssignedValue> getId() {
-			return ass;
-		}
+	
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -116,6 +120,14 @@ public class Parser implements IParser {
 			}
 
 		}
+
+
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	// ______________________________________________________________________________________________
@@ -124,14 +136,6 @@ public class Parser implements IParser {
 		Lexeme assign, semiCol, id;
 		INode exp;
 
-		@Override
-		public Lexeme evaluate() throws Exception {
-			return null;
-		}
-		
-		public AssignedValue getId() throws Exception {
-			return new AssignedValue(id, exp.evaluate());
-		}
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -165,6 +169,13 @@ public class Parser implements IParser {
 				throw new ParserException("Wrong id: " + token.current().value());
 		}
 
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 	// ______________________________________________________________________________________________
 
@@ -172,22 +183,7 @@ public class Parser implements IParser {
 		INode term, exp;
 		Lexeme arOp;
 
-		@Override
-		public Lexeme evaluate() throws Exception {
-
-			if (term != null && exp == null && arOp == null)
-				return term.evaluate();
-			else if (term != null && exp != null && arOp != null) {
-				if (arOp.token() == Token.ADD_OP) {
-					return new Lexeme((double) term.evaluate().value() + (double) exp.evaluate().value(),
-							Token.INT_LIT);
-				} else if (arOp.token() == Token.SUB_OP) {
-					return new Lexeme((double) term.evaluate().value() - (double) exp.evaluate().value(),
-							Token.INT_LIT);
-				}
-			}
-			return null;
-		}
+		
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -206,6 +202,14 @@ public class Parser implements IParser {
 				exp.buildString(builder, tabs + 1);
 			}
 		}
+
+
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 	// ______________________________________________________________________________________________
 
@@ -213,22 +217,7 @@ public class Parser implements IParser {
 		INode fact, term;
 		Lexeme arOp;
 
-		@Override
-		public Lexeme evaluate() throws Exception {
 
-			if (fact != null && term == null && arOp == null)
-				return fact.evaluate();
-			else if (fact != null && term != null && arOp != null) {
-				if (arOp.token() == Token.MULT_OP) {
-					return new Lexeme((double) fact.evaluate().value() * (double) term.evaluate().value(),
-							Token.INT_LIT);
-				} else if (arOp.token() == Token.DIV_OP) {
-					return new Lexeme((double) fact.evaluate().value() / (double) term.evaluate().value(),
-							Token.INT_LIT);
-				}
-			}
-			return null;
-		}
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -248,6 +237,14 @@ public class Parser implements IParser {
 			}
 		}
 
+
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 	// ______________________________________________________________________________________________
 
@@ -255,16 +252,7 @@ public class Parser implements IParser {
 		Lexeme lex;
 		INode exp;
 
-		@Override
-		public Lexeme evaluate() throws Exception {
 
-			if (lex != null)
-				return lex;
-			else if (exp != null) {
-				return exp.evaluate();
-			}
-			return null;
-		}
 
 		@Override
 		public void buildString(StringBuilder builder, int tabs)
@@ -291,6 +279,14 @@ public class Parser implements IParser {
 			} else
 				throw new ParserException("False factor: " + token.current().value());
 
+		}
+
+
+
+		@Override
+		public Object evaluate(Object[] args) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
